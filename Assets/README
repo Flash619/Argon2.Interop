@@ -1,0 +1,5 @@
+# Assets
+This directory contains assets (libraries) required for Argon hashing. Both 64 and 32 bit libraries are available for convenience,
+and have been built from the "phc-winner-argon2" submodule within this repository.
+
+For Argon2 licensing refer to "ARGON_LICENSE" within the Assets directory.
