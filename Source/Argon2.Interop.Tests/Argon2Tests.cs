@@ -10,6 +10,7 @@ public class Argon2Tests
         var argon = new Argon2();
 
         var hash = argon.Hash("ilikecheese");
+        var result = argon.Verify(hash, "ilikecheese");
         
         Console.WriteLine(hash);
     }
