@@ -14,9 +14,8 @@ public class Argon2
     /// <summary>
     /// Creates a new Argon2 wrapper with default option values.
     /// </summary>
-    public Argon2()
+    public Argon2() : this(new Argon2Options())
     {
-        _options = new Argon2Options();
     }
     
     /// <summary>
@@ -25,6 +24,8 @@ public class Argon2
     /// <param name="options">The options.</param>
     public Argon2(Argon2Options options)
     {
+        ValidateOptions(options);
+        
         _options = options;
     }
 
@@ -34,7 +35,7 @@ public class Argon2
     /// <remarks>
     /// The password will be converted to UTF-8 bytes prior to hashing.
     /// Salt bytes will automatically be generated with a length equal to that
-    /// of the password bytes. 
+    /// of the password bytes, or the minimum salt length, whichever is greater.
     /// </remarks>
     /// <param name="password">The password.</param>
     /// <returns>The encoded string.</returns>
@@ -57,7 +58,8 @@ public class Argon2
     /// Hashes the given password bytes returning an Argon2 encoded string.
     /// </summary>
     /// <remarks>
-    /// Salt bytes will automatically be generated with a length equal to that of the password bytes.
+    /// Salt bytes will automatically be generated with a length equal to that of the password bytes, or
+    /// the minimum salt length, whichever is greater.
     /// </remarks>
     /// <param name="password">The password.</param>
     /// <returns>The encoded string.</returns>
@@ -83,7 +85,7 @@ public class Argon2
     /// <remarks>
     /// The password will be converted to UTF-8 bytes prior to hashing.
     /// Salt bytes will automatically be generated with a length equal to that
-    /// of the password bytes. 
+    /// of the password bytes or the minimum salt length, whichever is greater.
     /// </remarks>
     /// <param name="password">The password.</param>
     /// <param name="hash">The hash bytes.</param>
@@ -118,7 +120,8 @@ public class Argon2
     /// Hashes the given password bytes outputting the generated hash bytes and Argon2 encoded string.
     /// </summary>
     /// <remarks>
-    /// Salt bytes will automatically be generated with a length equal to that of the password bytes.
+    /// Salt bytes will automatically be generated with a length equal to that of the password bytes,
+    /// or the minimum salt length, whichever is greater.
     /// </remarks>
     /// <param name="password">The password bytes.</param>
     /// <param name="hash">The hash bytes.</param>
@@ -229,6 +232,29 @@ public class Argon2
         if (error != Argon2Error.None)
         {
             throw new CryptographicException($"Failed to generate Argon2 hash. Error: {(int) error} ({error})");
+        }
+    }
+
+    private static void ValidateOptions(Argon2Options options)
+    {
+        if (options.HashLength < Argon2Constants.MinOutputLength)
+        {
+            throw new ArgumentException($"Minimum hash length is less than the minimum output length ({Argon2Constants.MinSaltLength}).");
+        }
+
+        if (options.Parallelism < Argon2Constants.MinLanes)
+        {
+            throw new ArgumentException($"Parallelism is less than the minimum lane count ({Argon2Constants.MinLanes}).");
+        }
+
+        if (options.MemoryCost == default)
+        {
+            throw new ArgumentException("MemoryCost cannot be 0.");
+        }
+
+        if (options.TimeCost == default)
+        {
+            throw new ArgumentException("TimeCost cannot be 0.");
         }
     }
 }

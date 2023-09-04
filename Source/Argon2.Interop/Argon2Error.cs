@@ -1,5 +1,8 @@
 ﻿namespace Argon2.Interop;
 
+/// <summary>
+/// Argon2 errors based on the C implementation.
+/// </summary>
 public enum Argon2Error
 {
     None = 0,
