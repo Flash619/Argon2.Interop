@@ -36,15 +36,15 @@ public class Argon2
             memoryCost: _options.MemoryCost,
             parallelism: _options.Parallelism, 
             password: password, 
-            passwordLength: password.Length, 
+            passwordLength: (nuint) password.Length, 
             salt: salt, 
-            saltLength: salt.Length,
+            saltLength: (nuint) salt.Length,
             hash: hash, 
             hashLength: _options.HashLength, 
             encoded: encoded,
-            encodedLength: encoded.Length, 
-            type: _options.Type, 
-            version: _options.Version);
+            encodedLength: (nuint) encoded.Length, 
+            type: (uint) _options.Type, 
+            version: (uint) _options.Version);
 
         if (error != Argon2Error.None)
         {
@@ -55,8 +55,8 @@ public class Argon2
     }
 
     [DllImport("libargon2", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Unicode)]
-    private static extern Argon2Error argon2_hash(int timeCost, int memoryCost, int parallelism, byte[] password, int passwordLength, byte[] salt, int saltLength, byte[] hash,
-        int hashLength, byte[] encoded, int encodedLength, Argon2Type type, Argon2Version version);
+    private static extern Argon2Error argon2_hash(uint timeCost, uint memoryCost, uint parallelism, byte[] password, nuint passwordLength, byte[] salt, nuint saltLength, byte[] hash,
+        nuint hashLength, byte[] encoded, nuint encodedLength, uint type, uint version);
 
     private static byte[] GenerateSalt(int length)
     {
