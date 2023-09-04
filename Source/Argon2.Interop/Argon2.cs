@@ -4,29 +4,72 @@ using System.Text;
 
 namespace Argon2.Interop;
 
+/// <summary>
+/// Argon2 wrapper used to hash and verify passwords.
+/// </summary>
 public class Argon2
 {
     private readonly Argon2Options _options;
 
+    /// <summary>
+    /// Creates a new Argon2 wrapper with default option values.
+    /// </summary>
     public Argon2()
     {
         _options = new Argon2Options();
     }
     
+    /// <summary>
+    /// Creates a new Argon2 wrapper with the options provided.
+    /// </summary>
+    /// <param name="options">The options.</param>
     public Argon2(Argon2Options options)
     {
         _options = options;
     }
 
+    /// <summary>
+    /// Hashes the given password returning an Argon2 encoded string.
+    /// </summary>
+    /// <remarks>
+    /// The password will be converted to UTF-8 bytes prior to hashing.
+    /// Salt bytes will automatically be generated with a length equal to that
+    /// of the password bytes. 
+    /// </remarks>
+    /// <param name="password">The password.</param>
+    /// <returns>The encoded string.</returns>
     public string Hash(string password)
         => Hash(Encoding.UTF8.GetBytes(password));
 
+    /// <summary>
+    /// Hashes the given password with the provided salt returning an Argon2 encoded string.
+    /// </summary>
+    /// <remarks>
+    /// The password and salt will be converted to UTF-8 bytes prior to hashing.
+    /// </remarks>
+    /// <param name="password">The password.</param>
+    /// <param name="salt">The salt.</param>
+    /// <returns>The encoded string.</returns>
     public string Hash(string password, string salt)
         => Hash(Encoding.UTF8.GetBytes(password), Encoding.UTF8.GetBytes(salt));
 
+    /// <summary>
+    /// Hashes the given password bytes returning an Argon2 encoded string.
+    /// </summary>
+    /// <remarks>
+    /// Salt bytes will automatically be generated with a length equal to that of the password bytes.
+    /// </remarks>
+    /// <param name="password">The password.</param>
+    /// <returns>The encoded string.</returns>
     public string Hash(byte[] password)
         => Hash(password, GenerateSalt(password.Length));
 
+    /// <summary>
+    /// Hashes the given password bytes using the provided salt bytes returning an Argon2 encoded string.
+    /// </summary>
+    /// <param name="password">The password bytes.</param>
+    /// <param name="salt">The salt bytes.</param>
+    /// <returns>The encoded string.</returns>
     public string Hash(byte[] password, byte[] salt)
     {
         Hash(password, salt, out var hash, out var encoded);
@@ -34,6 +77,17 @@ public class Argon2
         return encoded;
     }
 
+    /// <summary>
+    /// Hashes the given password outputting the generated hash bytes and Argon2 encoded string.
+    /// </summary>
+    /// <remarks>
+    /// The password will be converted to UTF-8 bytes prior to hashing.
+    /// Salt bytes will automatically be generated with a length equal to that
+    /// of the password bytes. 
+    /// </remarks>
+    /// <param name="password">The password.</param>
+    /// <param name="hash">The hash bytes.</param>
+    /// <param name="encoded">The encoded string.</param>
     public void Hash(string password, out byte[] hash, out string encoded)
     {
         Hash(Encoding.UTF8.GetBytes(password), out var outHash, out var outEncoded);
@@ -42,6 +96,16 @@ public class Argon2
         encoded = outEncoded;
     }
 
+    /// <summary>
+    /// Hashes the given password using the provided salt outputting the generated hash bytes and Argon2 encoded string.
+    /// </summary>
+    /// <remarks>
+    /// The password and salt will be converted to UTF-8 bytes prior to hashing.
+    /// </remarks>
+    /// <param name="password">The password.</param>
+    /// <param name="salt">The salt.</param>
+    /// <param name="hash">The hash bytes.</param>
+    /// <param name="encoded">The encoded string.</param>
     public void Hash(string password, string salt, out byte[] hash, out string encoded)
     {
         Hash(Encoding.UTF8.GetBytes(password), Encoding.UTF8.GetBytes(salt), out var outHash, out var outEncoded);
@@ -50,6 +114,15 @@ public class Argon2
         encoded = outEncoded;
     }
 
+    /// <summary>
+    /// Hashes the given password bytes outputting the generated hash bytes and Argon2 encoded string.
+    /// </summary>
+    /// <remarks>
+    /// Salt bytes will automatically be generated with a length equal to that of the password bytes.
+    /// </remarks>
+    /// <param name="password">The password bytes.</param>
+    /// <param name="hash">The hash bytes.</param>
+    /// <param name="encoded">The encoded string.</param>
     public void Hash(byte[] password, out byte[] hash, out string encoded)
     {
         Hash(password, GenerateSalt(Math.Max(Argon2Constants.MinSaltLength, password.Length)), out var outHash, out var outEncoded);
@@ -58,6 +131,13 @@ public class Argon2
         encoded = outEncoded;
     }
 
+    /// <summary>
+    /// Hashes the given password bytes using the provided salt bytes outputting the hash bytes and Argon2 encoded string.
+    /// </summary>
+    /// <param name="password">The password bytes.</param>
+    /// <param name="salt">The salt bytes.</param>
+    /// <param name="hash">The hash bytes.</param>
+    /// <param name="encoded">The encoded string.</param>
     public void Hash(byte[] password, byte[] salt, out byte[] hash, out string encoded)
     {
         var hashBuffer = new byte[_options.HashLength]; 
@@ -87,9 +167,30 @@ public class Argon2
         encoded = Encoding.ASCII.GetString(encodedBuffer.Where(x => x != 0x00).ToArray());
     }
 
+    /// <summary>
+    /// Verifies the given password matches the hash within the encoded string provided.
+    /// </summary>
+    /// <remarks>
+    /// The password will be converted to UTF-8 bytes prior to verification. The encoded string
+    /// is expected to be a valid Argon2 encoded string, and will be converted to ASCII bytes
+    /// prior to verification.
+    /// </remarks>
+    /// <param name="encoded">The encoded string.</param>
+    /// <param name="password">The password.</param>
+    /// <returns>Whether verification succeeded.</returns>
     public bool Verify(string encoded, string password)
         => Verify(encoded, Encoding.UTF8.GetBytes(password));
     
+    /// <summary>
+    /// Verifies the given password bytes matches the hash within the encoded string provided.
+    /// </summary>
+    /// <remarks>
+    /// The encoded string is expected to be a valid Argon2 encoded string, and will be converted
+    /// to ASCII bytes prior to verification.
+    /// </remarks>
+    /// <param name="encoded">The encoded string.</param>
+    /// <param name="password">The password bytes.</param>
+    /// <returns>Whether verification succeeded.</returns>
     public bool Verify(string encoded, byte[] password)
     {
         var error = Argon2Verify(Encoding.ASCII.GetBytes(encoded), password, (nuint) password.Length, (uint) _options.Type);
@@ -105,8 +206,7 @@ public class Argon2
     
     [DllImport("libargon2", CallingConvention = CallingConvention.Cdecl, EntryPoint = "argon2_encodedlen", CharSet = CharSet.Unicode)]
     private static extern nuint Argon2EncodedLength(uint timeCost, uint memoryCost, uint parallelism, nuint saltLength, nuint hashLength, uint type);
-
-
+    
     [DllImport("libargon2", CallingConvention = CallingConvention.Cdecl, EntryPoint = "argon2_hash", CharSet = CharSet.Unicode)]
     private static extern Argon2Error Argon2Hash(uint timeCost, uint memoryCost, uint parallelism, byte[] password, nuint passwordLength, byte[] salt, nuint saltLength, byte[] hash, nuint hashLength, byte[] encoded, nuint encodedLength, uint type, uint version);
 
