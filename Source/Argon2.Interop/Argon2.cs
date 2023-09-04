@@ -60,20 +60,21 @@ public class Argon2
 
     public void Hash(byte[] password, byte[] salt, out byte[] hash, out string encoded)
     {
-        var hashBuffer = new byte[_options.HashLength];
-        var expectedArgonTemplate = $"$argon2{_options.Type}$v={(uint)_options.Version}$m={_options.MemoryCost},t={_options.TimeCost},p={_options.Parallelism}$$";
+        var hashBuffer = new byte[_options.HashLength]; 
+        var encodedLength = Argon2EncodedLength(_options.TimeCost, _options.MemoryCost, _options.Parallelism, (nuint) salt.Length, _options.HashLength, (uint) _options.Type);
         // We are able to determine our expected hash length, however Argon2 requires the encoded array to be padded with at least 1 extra byte. We remove it later on.
-        var encodedBuffer = new byte[expectedArgonTemplate.Length + Base645Len(_options.HashLength) + Base645Len(salt.Length) + 1];
-        var error = argon2_hash(
-            timeCost: (uint) _options.TimeCost, 
-            memoryCost: (uint) _options.MemoryCost,
-            parallelism: (uint) _options.Parallelism, 
+        var encodedBuffer = new byte[encodedLength + 1];
+
+        var error = Argon2Hash(
+            timeCost: _options.TimeCost, 
+            memoryCost: _options.MemoryCost,
+            parallelism: _options.Parallelism, 
             password: password, 
             passwordLength: (nuint) password.Length, 
             salt: salt, 
             saltLength: (nuint) salt.Length,
             hash: hashBuffer, 
-            hashLength: (nuint) _options.HashLength, 
+            hashLength: _options.HashLength, 
             encoded: encodedBuffer,
             encodedLength: (nuint) encodedBuffer.Length, 
             type: (uint) _options.Type, 
@@ -91,7 +92,7 @@ public class Argon2
     
     public bool Verify(string encoded, byte[] password)
     {
-        var error = argon2_verify(Encoding.ASCII.GetBytes(encoded), password, (nuint)password.Length, (uint)_options.Type);
+        var error = Argon2Verify(Encoding.ASCII.GetBytes(encoded), password, (nuint) password.Length, (uint) _options.Type);
 
         if (error != Argon2Error.None && error != Argon2Error.VerifyMismatch)
         {
@@ -101,12 +102,16 @@ public class Argon2
         
         return error == Argon2Error.None;
     }
+    
+    [DllImport("libargon2", CallingConvention = CallingConvention.Cdecl, EntryPoint = "argon2_encodedlen", CharSet = CharSet.Unicode)]
+    private static extern nuint Argon2EncodedLength(uint timeCost, uint memoryCost, uint parallelism, nuint saltLength, nuint hashLength, uint type);
 
-    [DllImport("libargon2", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Unicode)]
-    private static extern Argon2Error argon2_hash(uint timeCost, uint memoryCost, uint parallelism, byte[] password, nuint passwordLength, byte[] salt, nuint saltLength, byte[] hash, nuint hashLength, byte[] encoded, nuint encodedLength, uint type, uint version);
 
-    [DllImport("libargon2", CallingConvention = CallingConvention.Cdecl, CharSet = CharSet.Unicode)]
-    private static extern Argon2Error argon2_verify(byte[] encoded, byte[] password, nuint passwordLength, uint type);
+    [DllImport("libargon2", CallingConvention = CallingConvention.Cdecl, EntryPoint = "argon2_hash", CharSet = CharSet.Unicode)]
+    private static extern Argon2Error Argon2Hash(uint timeCost, uint memoryCost, uint parallelism, byte[] password, nuint passwordLength, byte[] salt, nuint saltLength, byte[] hash, nuint hashLength, byte[] encoded, nuint encodedLength, uint type, uint version);
+
+    [DllImport("libargon2", CallingConvention = CallingConvention.Cdecl, EntryPoint = "argon2_verify", CharSet = CharSet.Unicode)]
+    private static extern Argon2Error Argon2Verify(byte[] encoded, byte[] password, nuint passwordLength, uint type);
     
     private static byte[] GenerateSalt(int length)
     {
@@ -117,11 +122,6 @@ public class Argon2
         rng.GetBytes(salt);
 
         return salt;
-    }
-    
-    private static int Base645Len(int length)
-    {
-        return (int) Math.Ceiling((double)length / 3 * 4);
     }
 
     private static void CheckArgonResponse(Argon2Error error)
