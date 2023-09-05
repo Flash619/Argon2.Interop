@@ -5,5 +5,22 @@
         <Nullable>enable</Nullable>
         <Configurations>Debug;Release</Configurations>
         <Platforms>AnyCPU</Platforms>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    </PropertyGroup>
+    
+    <PropertyGroup>
+        <PackageId>Argon2.Interop</PackageId>
+        <PackageVersion>1.0.0-beta-0001</PackageVersion>
+        <PackageReleaseNotes>Initial beta release.</PackageReleaseNotes>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <Copyright>Copyright (c) 2023 Travis Truttschel</Copyright>
+        <Authors>Travis Truttschel</Authors>
+        <PackageTags>argon;interop;argon2;wrapper</PackageTags>
+        <RepositoryUrl>https://github.com/Flash619/Argon2Interop</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageProjectUrl>https://github.com/Flash619/Argon2Interop</PackageProjectUrl>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <PackageOutputPath>./nupkg</PackageOutputPath>
+        <Description>Argon2 hashes generated through seamless interop for maximum performance. Argon2 Interop wraps the Argon2 C libraries, providing a C# interface for ease of use.</Description>
     </PropertyGroup>
 </Project>
