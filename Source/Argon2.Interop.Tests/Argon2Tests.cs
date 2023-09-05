@@ -7,7 +7,7 @@ public class Argon2Tests
     [Fact]
     public void CanHash()
     {
-        var argon = new Argon2();
+        var argon = new Argon2Interop();
 
         var hash = argon.Hash("ilikecheese");
         
@@ -17,7 +17,7 @@ public class Argon2Tests
     [Fact]
     public void HashesCanBeVerified()
     {
-        var argon = new Argon2();
+        var argon = new Argon2Interop();
 
         var hash = argon.Hash("ilikecheese");
         
@@ -27,7 +27,7 @@ public class Argon2Tests
     [Fact]
     public void CanNotVerifyIncorrectPassword()
     {
-        var argon = new Argon2();
+        var argon = new Argon2Interop();
 
         var hash = argon.Hash("ilikecheese");
         

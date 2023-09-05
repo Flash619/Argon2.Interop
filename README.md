@@ -7,7 +7,7 @@ An interop allowing for Argon2 hashing in .NET Core using the [Argon2 C implemen
 To use Argon2 Interop you will need to install the Argon2.Interop nuget package, as well as ensure the proper DLL is available at runtime based on your runtime architecture.
 
 1. Install the `Argon2.Interop` nuget package.
-2. Use the `Argon2` class to generate hashes.
+2. Use the `Argon2Interop` class from the `Argon2.Interop` namespace to generate hashes.
 3. Place a precompiled `libargon2` DLL from the `Assets` directory next to your processes executable.
 
 ### Which DLL to Use
@@ -35,7 +35,7 @@ most use cases. The following is all you typically will need.
 
 **Hashing a password:**
 ```c#
-var argon = new Argon2();
+var argon = new Argon2Interop();
 var hash = argon2.Hash("ilikecheese"); // Returnes an encoded hashed password.
 ```
 
@@ -43,7 +43,7 @@ var hash = argon2.Hash("ilikecheese"); // Returnes an encoded hashed password.
 To verify a password, pass both the encoded password hash and the password to compare it against to the `Verify` function.
 
 ```c#
-var argon = new Argon2();
+var argon = new Argon2Interop();
 
 if (! argon.Verify(encoded, "ilikecheese")) {
     throw new InvalidPasswordException();
@@ -55,7 +55,7 @@ Custom options can be passed to the `Argon2` constructor.
 
 **Using custom options:**
 ```c#
-var argon = new Argon2(new Argon2Options() {
+var argon = new Argon2Interop(new Argon2InteropOptions() {
     MemoryCost = 1024 * 64,
     TimeCost = 24,
     Parallelism = 6,
@@ -73,7 +73,7 @@ overload that outputs both the hash bytes as well as the encoded hash string.
 
 **Hashing to bytes:**
 ```c#
-var argon = new Argon2();
+var argon = new Argon2Interop();
 argon2.Hash("ilikecheese", out var hash, out var encoded); // Outputs hash bytes as well as an encoded hash string.
 ```
 
@@ -83,6 +83,6 @@ will be generated based on the password length.
 
 **Using custom salts:**
 ```c#
-var argon = new Argon2();
+var argon = new Argon2Interop();
 argon2.Hash("ilikecheese", "qwe123!@#");
 ```

@@ -5,9 +5,9 @@ using System.Text;
 namespace Argon2.Interop;
 
 /// <summary>
-/// Argon2 wrapper used to hash and verify passwords.
+/// Argon2 interop wrapper used to hash and verify passwords using the Argon2 C implementation.
 /// </summary>
-public class Argon2
+public class Argon2Interop
 {
     private readonly Argon2Options _options;
 
@@ -16,7 +16,7 @@ public class Argon2
     /// <summary>
     /// Creates a new Argon2 wrapper with default option values.
     /// </summary>
-    public Argon2() : this(new Argon2Options())
+    public Argon2Interop() : this(new Argon2Options())
     {
     }
     
@@ -24,7 +24,7 @@ public class Argon2
     /// Creates a new Argon2 wrapper with the options provided.
     /// </summary>
     /// <param name="options">The options.</param>
-    public Argon2(Argon2Options options)
+    public Argon2Interop(Argon2Options options)
     {
         ValidateOptions(options);
         
