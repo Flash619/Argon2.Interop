@@ -11,6 +11,8 @@ public class Argon2
 {
     private readonly Argon2Options _options;
 
+    private const string DllName = "libargon2";
+
     /// <summary>
     /// Creates a new Argon2 wrapper with default option values.
     /// </summary>
@@ -143,31 +145,38 @@ public class Argon2
     /// <param name="encoded">The encoded string.</param>
     public void Hash(byte[] password, byte[] salt, out byte[] hash, out string encoded)
     {
-        var hashBuffer = new byte[_options.HashLength]; 
-        var encodedLength = Argon2EncodedLength(_options.TimeCost, _options.MemoryCost, _options.Parallelism, (nuint) salt.Length, _options.HashLength, (uint) _options.Type);
-        // We are able to determine our expected hash length, however Argon2 requires the encoded array to be padded with at least 1 extra byte. We remove it later on.
-        var encodedBuffer = new byte[encodedLength + 1];
+        try
+        {
+            var hashBuffer = new byte[_options.HashLength];
+            var encodedLength = Argon2EncodedLength(_options.TimeCost, _options.MemoryCost, _options.Parallelism, (nuint)salt.Length, _options.HashLength, (uint)_options.Type);
+            // We are able to determine our expected hash length, however Argon2 requires the encoded array to be padded with at least 1 extra byte. We remove it later on.
+            var encodedBuffer = new byte[encodedLength + 1];
 
-        var error = Argon2Hash(
-            timeCost: _options.TimeCost, 
-            memoryCost: _options.MemoryCost,
-            parallelism: _options.Parallelism, 
-            password: password, 
-            passwordLength: (nuint) password.Length, 
-            salt: salt, 
-            saltLength: (nuint) salt.Length,
-            hash: hashBuffer, 
-            hashLength: _options.HashLength, 
-            encoded: encodedBuffer,
-            encodedLength: (nuint) encodedBuffer.Length, 
-            type: (uint) _options.Type, 
-            version: (uint) _options.Version);
+            var error = Argon2Hash(
+                timeCost: _options.TimeCost,
+                memoryCost: _options.MemoryCost,
+                parallelism: _options.Parallelism,
+                password: password,
+                passwordLength: (nuint)password.Length,
+                salt: salt,
+                saltLength: (nuint)salt.Length,
+                hash: hashBuffer,
+                hashLength: _options.HashLength,
+                encoded: encodedBuffer,
+                encodedLength: (nuint)encodedBuffer.Length,
+                type: (uint)_options.Type,
+                version: (uint)_options.Version);
 
-        CheckArgonResponse(error);
+            CheckArgonResponse(error);
 
-        hash = hashBuffer;
-        // Remove padding.
-        encoded = Encoding.ASCII.GetString(encodedBuffer.Where(x => x != 0x00).ToArray());
+            hash = hashBuffer;
+            // Remove padding.
+            encoded = Encoding.ASCII.GetString(encodedBuffer.Where(x => x != 0x00).ToArray());
+        }
+        catch (DllNotFoundException e)
+        {
+            throw new NotSupportedException($"The required Argon2 library ({DllName}) is not installed. For usage instructions visit https://github.com/Flash619/Argon2Interop.", e);
+        }
     }
 
     /// <summary>
@@ -207,13 +216,13 @@ public class Argon2
         return error == Argon2Error.None;
     }
     
-    [DllImport("libargon2", CallingConvention = CallingConvention.Cdecl, EntryPoint = "argon2_encodedlen", CharSet = CharSet.Unicode)]
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "argon2_encodedlen", CharSet = CharSet.Unicode)]
     private static extern nuint Argon2EncodedLength(uint timeCost, uint memoryCost, uint parallelism, nuint saltLength, nuint hashLength, uint type);
     
-    [DllImport("libargon2", CallingConvention = CallingConvention.Cdecl, EntryPoint = "argon2_hash", CharSet = CharSet.Unicode)]
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "argon2_hash", CharSet = CharSet.Unicode)]
     private static extern Argon2Error Argon2Hash(uint timeCost, uint memoryCost, uint parallelism, byte[] password, nuint passwordLength, byte[] salt, nuint saltLength, byte[] hash, nuint hashLength, byte[] encoded, nuint encodedLength, uint type, uint version);
 
-    [DllImport("libargon2", CallingConvention = CallingConvention.Cdecl, EntryPoint = "argon2_verify", CharSet = CharSet.Unicode)]
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "argon2_verify", CharSet = CharSet.Unicode)]
     private static extern Argon2Error Argon2Verify(byte[] encoded, byte[] password, nuint passwordLength, uint type);
     
     private static byte[] GenerateSalt(int length)
