@@ -29,11 +29,29 @@ cases options should not need to be adjusted. Default option values can be locat
 
 ## Usage Examples
 
+### Password Hashing
+Under normal use, excluding extraordinary circumstances or requirements, the default option values are secure enough for
+most use cases. The following is all you typically will need.
+
 **Hashing a password:**
 ```c#
 var argon = new Argon2();
 var hash = argon2.Hash("ilikecheese"); // Returnes an encoded hashed password.
 ```
+
+### Verifying a Password
+To verify a password, pass both the encoded password hash and the password to compare it against to the `Verify` function.
+
+```c#
+var argon = new Argon2();
+
+if (! argon.Verify(encoded, "ilikecheese")) {
+    throw new InvalidPasswordException();
+}
+```
+
+### Custom Options
+Custom options can be passed to the `Argon2` constructor.
 
 **Using custom options:**
 ```c#
@@ -47,4 +65,24 @@ var argon = new Argon2(new Argon2Options() {
     });
 
 var hash = argon2.Hash("ilikecheese");
+```
+
+### Hashing to Bytes
+In certain circumstances you may wish to work with the hash bytes directly. Hash bytes can be obtained by using the `Hash`
+overload that outputs both the hash bytes as well as the encoded hash string.
+
+**Hashing to bytes:**
+```c#
+var argon = new Argon2();
+argon2.Hash("ilikecheese", out var hash, out var encoded); // Outputs hash bytes as well as an encoded hash string.
+```
+
+### Custom Salts
+Custom salts can be passed, though they are not necessarily required. By default a random cryptographically secured salt
+will be generated based on the password length.
+
+**Using custom salts:**
+```c#
+var argon = new Argon2();
+argon2.Hash("ilikecheese", "qwe123!@#");
 ```
