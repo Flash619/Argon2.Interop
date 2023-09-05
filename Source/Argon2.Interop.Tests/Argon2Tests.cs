@@ -10,8 +10,27 @@ public class Argon2Tests
         var argon = new Argon2();
 
         var hash = argon.Hash("ilikecheese");
-        var result = argon.Verify(hash, "ilikecheese");
         
-        Console.WriteLine(hash);
+        Assert.NotNull(hash);
+    }
+
+    [Fact]
+    public void HashesCanBeVerified()
+    {
+        var argon = new Argon2();
+
+        var hash = argon.Hash("ilikecheese");
+        
+        Assert.True(argon.Verify(hash, "ilikecheese"));
+    }
+
+    [Fact]
+    public void CanNotVerifyIncorrectPassword()
+    {
+        var argon = new Argon2();
+
+        var hash = argon.Hash("ilikecheese");
+        
+        Assert.False(argon.Verify(hash, "idontlikecheese"));
     }
 }
