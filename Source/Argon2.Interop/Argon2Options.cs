@@ -73,4 +73,13 @@ public class Argon2Options
         Type = options.Type;
         Version = options.Version;
     }
+
+    /// <summary>
+    /// Generates a string representation of the options result using Argon2 style option labels.
+    /// </summary>
+    /// <returns>The string.</returns>
+    public override string ToString()
+    {
+        return $"T: {TimeCost}, M: {MemoryCost}, P: {Parallelism}, L: {HashLength}, T: {Type}, V: {Version}";
+    }
 }
