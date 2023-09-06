@@ -10,7 +10,7 @@
     
     <PropertyGroup>
         <PackageId>Argon2.Interop</PackageId>
-        <PackageVersion>1.0.0-beta-0002</PackageVersion>
+        <PackageVersion>1.0.0-beta-0003</PackageVersion>
         <PackageReleaseNotes>Initial beta release.</PackageReleaseNotes>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <Copyright>Copyright (c) 2023 Travis Truttschel</Copyright>
