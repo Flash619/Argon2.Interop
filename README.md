@@ -25,7 +25,27 @@ libargon yourself, it has been included as a submodule under `Source/External/ph
 
 ## Options
 All common Argon2 options are available and their default values reflect that of a secure configuration. In most
-cases options should not need to be adjusted. Default option values can be located within the [Argon2Options](https://github.com/Flash619/Argon2Interop/blob/main/Source/Argon2.Interop/Argon2Options.cs) class.
+cases options should not need to be adjusted. Default option values can be located within the [Argon2Options](https://github.com/Flash619/Argon2.Interop/blob/main/Source/Argon2.Interop/Argon2Options.cs) class.
+
+## Calibration
+Argon2 options can be calibrated to your runtime hardware automatically based on a flexible set of calibration options.
+You can simply define your minimum/maximum values as well as the maximum duration Argon2 should take to generate a hash.
+Default calibration option values can be located within the [Argon2CalibratorOptions](https://github.com/Flash619/Argon2.Interop/blob/main/Source/Argon2.Interop.Extensions.Calibration/Argon2CalibratorOptions.cs) class.
+
+**Calibrating Argon2**
+```c#
+var calibrator = new Argon2Calibrator(); // Use default options.
+var result = calibrator.Calibrate();
+
+var bestOptions = result.BestResult?.Options;
+
+if (bestOptions == default) {
+    throw new CryptographyException("Failed to generate Argon2 options that meet base requirements.");
+}
+
+var argon2 = new Argon2Interop(bestOptions); // Pass calibrated options to Argon2Interop.
+var hash = argon2.Hash("ilikecheese");
+```
 
 ## Usage Examples
 
