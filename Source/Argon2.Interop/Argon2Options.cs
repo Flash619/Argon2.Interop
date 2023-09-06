@@ -52,4 +52,25 @@ public class Argon2Options
     /// Defaults to 19.
     /// </remarks>
     public Argon2Version Version { get; init; } = Argon2Version.Nineteen;
+
+    /// <summary>
+    /// Creates a new Argon2Options instance with default values.
+    /// </summary>
+    public Argon2Options()
+    {
+    }
+
+    /// <summary>
+    /// Creates a new Argon2Options instance, copying the values from the instance provided.
+    /// </summary>
+    /// <param name="options">The instance.</param>
+    public Argon2Options(Argon2Options options)
+    {
+        TimeCost = options.TimeCost;
+        MemoryCost = options.MemoryCost;
+        Parallelism = options.Parallelism;
+        HashLength = options.HashLength;
+        Type = options.Type;
+        Version = options.Version;
+    }
 }

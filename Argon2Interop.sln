@@ -4,6 +4,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Argon2.Interop", "Source\Ar
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Argon2.Interop.Tests", "Source\Argon2.Interop.Tests\Argon2.Interop.Tests.csproj", "{16EF0B2C-ACD0-45B5-B9CB-CB69438EEA05}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Argon2.Interop.Extensions.Calibration", "Source\Argon2.Interop.Extensions.Calibration\Argon2.Interop.Extensions.Calibration.csproj", "{7DDB159B-1260-4551-B6EF-D412E9F4611E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -18,5 +20,9 @@ Global
 		{195D5A32-B3D9-478E-BA93-CE4EF49FE96D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{195D5A32-B3D9-478E-BA93-CE4EF49FE96D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{195D5A32-B3D9-478E-BA93-CE4EF49FE96D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7DDB159B-1260-4551-B6EF-D412E9F4611E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7DDB159B-1260-4551-B6EF-D412E9F4611E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7DDB159B-1260-4551-B6EF-D412E9F4611E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7DDB159B-1260-4551-B6EF-D412E9F4611E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

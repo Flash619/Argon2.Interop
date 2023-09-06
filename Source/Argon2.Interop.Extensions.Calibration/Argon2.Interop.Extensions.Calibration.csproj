@@ -1,0 +1,31 @@
+<Project Sdk="Microsoft.NET.Sdk">
+    <PropertyGroup>
+        <TargetFramework>net7.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        <Configurations>Debug;Release</Configurations>
+        <Platforms>AnyCPU</Platforms>
+        <GenerateDocumentationFile>true</GenerateDocumentationFile>
+        <RootNamespace>Argon2.Interop</RootNamespace>
+    </PropertyGroup>
+    
+    <PropertyGroup>
+        <PackageId>Argon2.Interop.Extensions.Calibration</PackageId>
+        <PackageVersion>1.0.0-beta-0001</PackageVersion>
+        <PackageReleaseNotes>Initial beta release.</PackageReleaseNotes>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <Copyright>Copyright (c) 2023 Travis Truttschel</Copyright>
+        <Authors>Travis Truttschel</Authors>
+        <PackageTags>argon;interop;argon2;calibration;wrapper</PackageTags>
+        <RepositoryUrl>https://github.com/Flash619/Argon2Interop</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageProjectUrl>https://github.com/Flash619/Argon2Interop</PackageProjectUrl>
+        <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+        <PackageOutputPath>./nupkg</PackageOutputPath>
+        <Description>Automatically calibrate Argon2 Interop options to achieve maximum hash strength based on a flexible set of requirements.</Description>
+    </PropertyGroup>
+    
+    <ItemGroup>
+      <ProjectReference Include="..\Argon2.Interop\Argon2.Interop.csproj" />
+    </ItemGroup>
+</Project>
