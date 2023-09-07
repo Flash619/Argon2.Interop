@@ -11,7 +11,10 @@ public class Argon2Interop
 {
     private readonly Argon2Options _options;
 
-    private const string DllName = "libargon2";
+    /// <summary>
+    /// The name of the compiled Argon2 DLL Argon2Interop will attempt to use when communicating with Argon2.
+    /// </summary>
+    public const string DllName = "libargon2";
 
     /// <summary>
     /// Creates a new Argon2 wrapper with default option values.
@@ -175,7 +178,7 @@ public class Argon2Interop
         }
         catch (DllNotFoundException e)
         {
-            throw new NotSupportedException($"The required Argon2 library ({DllName}) is not installed. For usage instructions visit https://github.com/Flash619/Argon2Interop.", e);
+            throw new DllNotFoundException($"The required Argon2 library ({DllName}) is not installed. For usage instructions visit https://github.com/Flash619/Argon2.Interop.", e);
         }
     }
 
@@ -240,7 +243,7 @@ public class Argon2Interop
     {
         if (error != Argon2Error.None)
         {
-            throw new CryptographicException($"Failed to generate Argon2 hash. Error: {(int) error} ({error})");
+            throw new Argon2Exception(error);
         }
     }
 
