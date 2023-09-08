@@ -13,10 +13,11 @@ public class Argon2Exception : CryptographicException
     public readonly Argon2Error Error;
 
     /// <summary>
-    /// Creates a new Argon2Exception instance for the error provided.
+    /// Creates a new Argon2Exception instance for the message and error provided.
     /// </summary>
-    /// <param name="error"></param>
-    public Argon2Exception(Argon2Error error) : base($"An error occurred while performing the requested operation. Error: {(int) error} ({error})")
+    /// <param name="message">The message.</param>
+    /// <param name="error">The error.</param>
+    public Argon2Exception(string message, Argon2Error error) : base($"An error occurred while performing the requested operation. Error: {(int) error} ({error}) - \"{message}\"")
     {
         Error = error;
     }

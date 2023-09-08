@@ -29,8 +29,6 @@ public class Argon2Interop
     /// <param name="options">The options.</param>
     public Argon2Interop(Argon2Options options)
     {
-        ValidateOptions(options);
-        
         _options = options;
     }
 
@@ -252,7 +250,7 @@ public class Argon2Interop
 
         if (encodedParts.Length != 6)
         {
-            throw new Argon2Exception(Argon2Error.DecodingFail);
+            throw new Argon2Exception("Decoding failed. The encoded string was malformed.", Argon2Error.DecodingFail);
         }
 
         var versionPart = encodedParts[2];
@@ -260,7 +258,7 @@ public class Argon2Interop
 
         if (versionParts.Length != 2 || ! int.TryParse(versionParts[1], out var version) || ! Enum.IsDefined(typeof(Argon2Version), version))
         {
-            throw new Argon2Exception(Argon2Error.EncodingFail);
+            throw new Argon2Exception("Decoding failed. The encoded string was malformed or the version does not exist.", Argon2Error.DecodingFail);
         }
 
         return (Argon2Version) version;
@@ -274,6 +272,10 @@ public class Argon2Interop
 
     [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "argon2_verify", CharSet = CharSet.Unicode)]
     private static extern Argon2Error Argon2Verify(byte[] encoded, byte[] password, nuint passwordLength, uint type);
+    
+    [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "argon2_error_message", CharSet = CharSet.Unicode)]
+    private static extern string Argon2ErrorMessage(int errorCode);
+
     
     private static byte[] GenerateSalt(int length)
     {
@@ -290,30 +292,7 @@ public class Argon2Interop
     {
         if (error != Argon2Error.None)
         {
-            throw new Argon2Exception(error);
-        }
-    }
-
-    private static void ValidateOptions(Argon2Options options)
-    {
-        if (options.HashLength < Argon2Constants.MinOutputLength)
-        {
-            throw new ArgumentException($"Minimum hash length is less than the minimum output length ({Argon2Constants.MinSaltLength}).");
-        }
-
-        if (options.Parallelism < Argon2Constants.MinLanes)
-        {
-            throw new ArgumentException($"Parallelism is less than the minimum lane count ({Argon2Constants.MinLanes}).");
-        }
-
-        if (options.MemoryCost == default)
-        {
-            throw new ArgumentException("MemoryCost cannot be 0.");
-        }
-
-        if (options.TimeCost == default)
-        {
-            throw new ArgumentException("TimeCost cannot be 0.");
+            throw new Argon2Exception(Argon2ErrorMessage((int) error), error);
         }
     }
 }
