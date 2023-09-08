@@ -218,6 +218,53 @@ public class Argon2Interop
         
         return error == Argon2Error.None;
     }
+
+    /// <summary>
+    /// Returns true if the Argon2 encoded string provided was created with an older version
+    /// of Argon2 than the interop is configured for. 
+    /// </summary>
+    /// <remarks>
+    /// In example, if the interop is configured to use version 19, and the encoded string was
+    /// created with version 16, this method will return true. This method will only return
+    /// true if the encoded string version is less than the configured version for the interop.
+    /// </remarks>
+    /// <param name="encoded">The encoded string.</param>
+    /// <returns>Whether a re-hash is needed.</returns>
+    public bool NeedsReHash(string encoded)
+    {
+        return GetVersion(encoded) < _options.Version;
+    }
+
+    /// <summary>
+    /// Extracts and returns the Argon2 version used to generate an Argon2 encoded string.
+    /// </summary>
+    /// <remarks>
+    /// Argon2 encoded strings all contain the version number of Argon2 which was used to
+    /// generate the hash and encoded string. This function works as a helper to extract
+    /// the Argon2 version number from the encoded string.
+    /// </remarks>
+    /// <param name="encoded">The encoded string.</param>
+    /// <returns>The version.</returns>
+    /// <exception cref="Argon2Exception">There was an error while decoding the encoded string.</exception>
+    public Argon2Version GetVersion(string encoded)
+    {
+        var encodedParts = encoded.Split("$");
+
+        if (encodedParts.Length != 6)
+        {
+            throw new Argon2Exception(Argon2Error.DecodingFail);
+        }
+
+        var versionPart = encodedParts[2];
+        var versionParts = versionPart.Split("=");
+
+        if (versionParts.Length != 2 || ! int.TryParse(versionParts[1], out var version) || ! Enum.IsDefined(typeof(Argon2Version), version))
+        {
+            throw new Argon2Exception(Argon2Error.EncodingFail);
+        }
+
+        return (Argon2Version) version;
+    }
     
     [DllImport(DllName, CallingConvention = CallingConvention.Cdecl, EntryPoint = "argon2_encodedlen", CharSet = CharSet.Unicode)]
     private static extern nuint Argon2EncodedLength(uint timeCost, uint memoryCost, uint parallelism, nuint saltLength, nuint hashLength, uint type);
